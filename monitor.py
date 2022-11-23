@@ -12,15 +12,14 @@ account = settings['ACCOUNT_ADDRESS']
 
 web3 = Web3(Web3.HTTPProvider(infura_url))
 
-def confirmations(tx_hash):
-    tx = web3.eth.get_transaction(tx_hash)
-    return web3.eth.block_number - tx.blockNumber
-
-def debugTable(table):
+def debugTable(table, allEntries=False):
     print( "" )
     print( " ---- Confirmations Table ----" )
     for entry in table:
-        print(f"     :: { entry } ")
+        if allEntries:
+            print(f"     :: { entry } ")
+        else:
+            print(f"     :: { entry[0] }, {entry[1].hash} ")
     print( "" )
 
 def watch():
@@ -58,16 +57,11 @@ def watch():
             if len(txConfirmTable) > 1:
                 # increment all entries by 1 confirmation
                 for entry in txConfirmTable:
-                    confirmations  = entry[0]
-                    transaction = entry[1]
                     entry[0] += 1
                     print("++++++++++++++++++")
                     print(entry[0])     # confirmations
                     print(entry[1])     # transactions
                     
-                # check confirmations and consider finalized when 6 occur
-                print("----------------- CHECKING---------------")
-                for entry in txConfirmTable:   
                     if entry[0] > 5:
                         txConfirmTable.remove(entry)
                         print(f"     - Removed: { entry }" ) 
@@ -78,8 +72,5 @@ def watch():
             prevBlock = block 
             
         time.sleep(5)
-        # instead of sleep we try do some work here like checking confirmations
 
 watch()
-# print(confirmations("0x0d40d60e118e9e1f61c2baa2252cc5f8b8ed491c885ec35db6fd6cfc8589c1a7"))
-# If confirmations is 6 then we can finalize it
